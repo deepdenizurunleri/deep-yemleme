@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Deep Deniz Yemleme</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background:#0d47a1; color:#fff; margin:0; padding:0; }
+.container { max-width:540px; margin:auto; padding:16px; }
+h1 { text-align:center; margin:4px 0; }
+h2 { font-size:16px; margin-top:18px; border-bottom:1px solid rgba(255,255,255,0.3); padding-bottom:4px; }
+label { display:block; margin-top:10px; font-size:14px; }
+input, select, button { width:100%; padding:8px; margin-top:4px; border-radius:6px; border:none; box-sizing:border-box; }
+input, select { color:#000; }
+button { font-weight:600; margin-top:12px; cursor:pointer; }
+button.primary { background:#ffb300; color:#000; }
+button.secondary { background:#eeeeee; color:#000; }
+.result { white-space:pre-wrap; background:rgba(0,0,0,0.3); padding:12px; margin-top:16px; border-radius:8px; font-size:14px; }
+.history { white-space:pre-wrap; background:rgba(0,0,0,0.15); padding:10px; margin-top:8px; border-radius:6px; font-size:12px; max-height:220px; overflow-y:auto; }
+.small-note { font-size:11px; opacity:0.85; margin-top:6px; }
+.logo-box { text-align:center; margin-bottom:8px; }
+.logo-title { font-size:20px; font-weight:700; letter-spacing:1px; }
+.logo-sub { font-size:14px; margin-top:4px; font-weight:700; }
+</style>
+</head>
+<body>
+<div class="container">
+
+
+<div class="logo-box">
+  <!-- Önce senin PNG logon, yüklenmezse alttaki SVG yedek devreye girer -->
+  <img src="deepdeniz_logo.png" alt="Deep Deniz Ürünleri Logo" style="max-width:230px; height:auto; display:block; margin:0 auto 8px auto; filter: drop-shadow(0 0 10px rgba(0,0,0,0.6));"
+       onerror="this.style.display='none'; document.getElementById('fallbackLogo').style.display='inline-block';">
+  <!-- Yedek vektörel logo -->
+  <svg id="fallbackLogo" width="130" height="90" viewBox="0 0 130 90" xmlns="http://www.w3.org/2000/svg" style="display:none;">
+    <defs>
+      <linearGradient id="fishGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#4fc3f7"/>
+        <stop offset="100%" stop-color="#01579b"/>
+      </linearGradient>
+    </defs>
+    <circle cx="45" cy="45" r="32" fill="none" stroke="#bbdefb" stroke-width="4"/>
+    <ellipse cx="48" cy="45" rx="24" ry="14" fill="url(#fishGrad)" stroke="#0d47a1" stroke-width="2"/>
+    <polygon points="64,38 78,32 78,58 64,52" fill="url(#fishGrad)" stroke="#0d47a1" stroke-width="2"/>
+    <polygon points="40,37 30,30 34,44" fill="#0288d1" stroke="#0d47a1" stroke-width="1.5"/>
+    <circle cx="42" cy="42" r="3" fill="#000"/>
+    <circle cx="41.5" cy="41.5" r="1.2" fill="#fff"/>
+    <path d="M15 20 Q 25 10, 40 20 T 60 18" fill="none" stroke="#ffee58" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2 3"/>
+    <path d="M60 18 q 3 5 0 10" fill="none" stroke="#ffee58" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>
+  <div class="logo-title">DEEP DENİZ ÜRÜNLERİ</div>
+  <div class="logo-sub"></div>
+</div>
+
+  
+</div>
+
+<h1>Deep Deniz Yemleme</h1>
+
+<h2>Balık ve Havuz Bilgileri</h2>
+
+<label>Balık türü</label>
+<select id="species">
+  <option value="Levrek">Levrek</option>
+  <option value="Çipura">Çipura</option>
+  <option value="Granyöz">Granyöz</option>
+</select>
+
+<label>Balık adeti (toplam)</label>
+<input id="count" type="number" inputmode="numeric" placeholder="Örn: 43000">
+
+<label>Havuz sayısı</label>
+<input id="pondCount" type="number" inputmode="numeric" placeholder="Örn: 2">
+
+<label>Ortalama balık ağırlığı (g)</label>
+<input id="weight" type="number" step="0.1" inputmode="decimal" placeholder="Örn: 325">
+
+<label>Günlük yemleme oranı (%)</label>
+<input id="percent" type="number" step="0.1" inputmode="decimal" placeholder="Örn: 1.2">
+
+<label>Günlük öğün sayısı</label>
+<input id="meals" type="number" inputmode="numeric" placeholder="Örn: 2">
+<h2>Zaman Planı ve Hedef Ağırlık</h2>
+
+<label>Balıkların havuza atıldığı tarih</label>
+<input id="startDate" type="date">
+
+<label>Hedef tarih</label>
+<input id="targetDate" type="date">
+
+<label>Hedef balık ağırlığı (g)</label>
+<input id="targetWeight" type="number" step="0.1" inputmode="decimal" placeholder="Örn: 600">
+
+
+<h2>Su ve Hava Bilgileri (Opsiyonel)</h2>
+
+<label>Bölge / Lokasyon</label>
+<input id="region" placeholder="Örn: Muğla – Akyaka">
+
+<label>Hava sıcaklığı (°C)</label>
+<input id="airtemp" type="number" step="0.1" inputmode="decimal" placeholder="Örn: 21">
+
+<label>Su sıcaklığı (°C)</label>
+<input id="watertemp" type="number" step="0.1" inputmode="decimal" placeholder="Örn: 18">
+
+<label>Tuzluluk (‰ / ppt)</label>
+<input id="salinity" type="number" step="0.1" inputmode="decimal" placeholder="Örn: 30–38">
+
+<label>Oksijen (mg/L)</label>
+<input id="oxygen" type="number" step="0.1" inputmode="decimal" placeholder="Örn: 6–8">
+
+<h2>Yem ve FCR</h2>
+
+<label>Yem markası (FCR hesabı)</label>
+<select id="brand">
+  <option value="Biomar">Biomar</option>
+  <option value="Skretting">Skretting</option>
+</select>
+
+<div class="small-note">
+Biomar / Skretting için tipik FCR aralıkları tür ve ortalama gramaja göre otomatik seçilir. İstersen aşağıya manuel yazıp bu değeri ezebilirsin.
+</div>
+
+<label>FCR (isteğe bağlı, kg yem / kg büyüme)</label>
+<input id="fcrManual" type="number" step="0.01" inputmode="decimal" placeholder="Boş bırakırsan otomatik FCR kullanılır">
+
+<label>Hesap süresi (gün)</label>
+<input id="days" type="number" inputmode="numeric" placeholder="Örn: 30">
+
+<h2>Depo stok takibi</h2>
+
+<label>Depodaki mevcut yem stoğu (kg)</label>
+<input id="stock" type="number" step="0.1" inputmode="decimal" placeholder="Örn: 3000">
+
+<label>Bugün / dönem içinde kullanılan yem (kg)</label>
+<input id="used" type="number" step="0.1" inputmode="decimal" placeholder="Boşsa günlük yem kadar kabul edilir">
+
+<button class="primary" onclick="hesapla()">HESAPLA</button>
+<button class="secondary" onclick="window.print()">RAPORU PDF OLARAK KAYDET</button>
+<button class="secondary" onclick="shareWhatsApp()">WHATSAPP İÇİN PAYLAŞ</button>
+<button class="secondary" onclick="addGroup()">BU HAVUZU TOPLU RAPORA EKLE</button>
+<button class="secondary" onclick="showMultiReport()">TOPLU RAPORU GÖSTER</button>
+
+<div id="multiInfo" class="small-note" style="margin-top:4px;">
+Toplu rapora eklenen havuz sayısı: <span id="multiCount">0</span>
+</div>
+
+
+<div id="result" class="result">Sonuç burada görünecek.</div>
+
+<h2>Kayıtlı raporlar (bu cihazda)</h2>
+<div id="history" class="history">Kayıt yok.</div>
+<div class="small-note">Her hesaplama sonrası özet bu cihaza kaydedilir (maksimum 20 kayıt). İnternet veya sunucu gerekmez.</div>
+
+</div>
+
+<script>
+let multiGroups = [];
+
+function toNum(v){ if(v===undefined||v===null||v==='') return NaN; return parseFloat(String(v).replace(',','.')); }
+function fcrAuto(brand,species,weight){
+    if(isNaN(weight)||weight<=0) return 1.6;
+    if(brand==="Biomar"){
+        if(species==="Levrek"){
+            if(weight<200) return 1.30;
+            if(weight<400) return 1.45;
+            return 1.55;
+        }
+        if(species==="Çipura"){
+            if(weight<200) return 1.40;
+            if(weight<400) return 1.55;
+            return 1.70;
+        }
+    }
+    if(brand==="Skretting"){
+        if(species==="Levrek"){
+            if(weight<200) return 1.25;
+            if(weight<400) return 1.40;
+            return 1.50;
+        }
+        if(species==="Çipura"){
+            if(weight<200) return 1.35;
+            if(weight<400) return 1.50;
+            return 1.65;
+        }
+    }
+    return 1.60;
+}
+function format(num,dec){ return Number(num).toLocaleString('tr-TR',{minimumFractionDigits:dec,maximumFractionDigits:dec}); }
+
+function yemOnerisi(species, weight){
+    let txt = "";
+    if(species==="Levrek"){
+        if(weight < 50){
+            txt = "Levrek yavru: mikro pellet, 0,8–1,5 mm, ≥ %50 protein, sık öğün.";
+        } else if(weight < 150){
+            txt = "Levrek 50–150 g: 2–3 mm pellet, yaklaşık %46–48 protein.";
+        } else if(weight < 300){
+            txt = "Levrek 150–300 g: 3–4 mm pellet, yaklaşık %45–47 protein.";
+        } else {
+            txt = "Levrek 300 g+: 4–6 mm pellet, yaklaşık %40–45 protein.";
+        }
+    } else if(species==="Çipura"){
+        if(weight < 50){
+            txt = "Çipura yavru: mikro pellet, 0,8–1,5 mm, ≥ %48 protein.";
+        } else if(weight < 150){
+            txt = "Çipura 50–150 g: 2–3 mm pellet, yaklaşık %44–46 protein.";
+        } else if(weight < 300){
+            txt = "Çipura 150–300 g: 3–4 mm pellet, yaklaşık %42–45 protein.";
+        } else {
+            txt = "Çipura 300 g+: 4–6 mm pellet, yaklaşık %38–42 protein.";
+        }
+    } else if(species==="Granyöz"){
+        txt = "Granyöz: levrek tipi yüksek proteinli yem; çoğunlukla 3–5 mm pellet, %42–48 protein aralığı tercih edilir.";
+    } else {
+        txt = "Tür: Diğer – kullandığın yem markasının tür tablosuna göre pellet çapı ve protein oranını seç.";
+    }
+    return txt;
+}
+
+
+function calcCurrent(params){
+    // Ortak hesaplama fonksiyonu: formdaki değerlerden hesap nesnesi üretir.
+    const species = params.species;
+    const count = params.count;
+    const ponds = params.ponds;
+    const weight = params.weight;
+    const percent = params.percent;
+    const meals = params.meals;
+    const brand = params.brand;
+    const fcrManual = params.fcrManual;
+    const days = params.days;
+    const stock = params.stock;
+    const used = params.used;
+    const region = params.region;
+    const airtemp = params.airtemp;
+    const wt = params.wt;
+    const sal = params.sal;
+    const oxy = params.oxy;
+
+    const biomass = count * weight / 1000.0;
+    const dailyFeed = biomass * (percent / 100.0);
+    const feedPerMeal = dailyFeed / meals;
+    const weeklyFeed = dailyFeed * 7;
+    const periodFeed = dailyFeed * days;
+
+    const pondsValid = !isNaN(ponds) && ponds > 0;
+    const dailyFeedPerPond = pondsValid ? (dailyFeed / ponds) : NaN;
+
+    let fcr, fcrNote;
+    if(!isNaN(fcrManual) && fcrManual>0){
+        fcr = fcrManual;
+        fcrNote = 'Manuel girilen FCR kullanıldı.';
+    } else {
+        fcr = fcrAuto(brand,species,weight);
+        fcrNote = 'Yem markası ('+brand+') ve ortalama gramaja göre otomatik FCR kullanıldı.';
+    }
+
+    const dailyGain = dailyFeed / fcr;
+    const periodGain = periodFeed / fcr;
+    const endBiomass = biomass + periodGain;
+    const endWeight = endBiomass * 1000.0 / count;
+
+    let usedFinal = used;
+    if(isNaN(usedFinal)) usedFinal = dailyFeed;
+
+    let remaining = NaN, daysLeft = NaN;
+    if(!isNaN(stock)){
+        remaining = stock - usedFinal;
+        if(remaining<0) remaining = 0;
+        daysLeft = dailyFeed>0 ? remaining/dailyFeed : NaN;
+    }
+
+    return {
+        species, count, ponds, weight, percent, meals,
+        brand, fcr, fcrNote, days,
+        region, airtemp, wt, sal, oxy,
+        biomass, dailyFeed, feedPerMeal, weeklyFeed, periodFeed,
+        pondsValid, dailyFeedPerPond,
+        dailyGain, periodGain, endBiomass, endWeight,
+        stock, used: usedFinal, remaining, daysLeft
+    };
+}
+
+function addGroup(){
+    // Formdaki mevcut havuzu toplu rapora ekler
+    const species = document.getElementById('species').value;
+    const startDateStr = document.getElementById('startDate').value;
+    const targetDateStr = document.getElementById('targetDate').value;
+    const targetWeight = toNum(document.getElementById('targetWeight').value);
+
+    const count = toNum(document.getElementById('count').value);
+    const ponds = toNum(document.getElementById('pondCount').value);
+    const weight = toNum(document.getElementById('weight').value);
+    const percent = toNum(document.getElementById('percent').value);
+    const meals = toNum(document.getElementById('meals').value);
+    const brand = document.getElementById('brand').value;
+    let fcrManual = toNum(document.getElementById('fcrManual').value);
+    const days = toNum(document.getElementById('days').value) || 30;
+
+    if(isNaN(count) || isNaN(weight) || isNaN(percent) || isNaN(meals)){
+        alert('Önce bu havuz için balık adedi, ağırlık, %yem ve öğün sayısını doldurun.');
+        return;
+    }
+    const params = {
+        species,
+        count,
+        ponds,
+        weight,
+        percent,
+        meals,
+        brand,
+        fcrManual,
+        days,
+        stock: NaN,
+        used: NaN,
+        region: document.getElementById('region').value,
+        airtemp: document.getElementById('airtemp').value,
+        wt: document.getElementById('watertemp').value,
+        sal: document.getElementById('salinity').value,
+        oxy: document.getElementById('oxygen').value
+    };
+    const calc = calcCurrent(params);
+    multiGroups.push(calc);
+    const c = document.getElementById('multiCount');
+    if(c) c.textContent = String(multiGroups.length);
+    alert('Havuz toplu rapora eklendi. Başka havuzlar için alanları değiştirip tekrar ekleyebilirsiniz.');
+}
+
+function showMultiReport(){
+    if(!multiGroups.length){
+        alert('Toplu rapor için önce en az bir havuz ekleyin.');
+        return;
+    }
+    let totalBiomass = 0, totalDailyFeed = 0, totalWeeklyFeed = 0, totalPeriodFeed = 0, totalCount = 0;
+    let text = 'TOPLU RAPOR (Havuz Özetleri)\n\n';
+    multiGroups.forEach((g, idx) => {
+        totalBiomass += g.biomass;
+        totalDailyFeed += g.dailyFeed;
+        totalWeeklyFeed += g.weeklyFeed;
+        totalPeriodFeed += g.periodFeed;
+        totalCount += g.count;
+        text += '#' + (idx+1) + ' Havuz\n';
+        text += 'Tür: ' + g.species + '\n';
+        text += 'Balık adedi: ' + g.count.toLocaleString('tr-TR') + '\n';
+        if(g.pondsValid){
+            text += 'Havuz sayısı: ' + g.ponds + '\n';
+            text += 'Havuz başı günlük yem: ' + format(g.dailyFeedPerPond,2) + ' kg\n';
+        }
+        text += 'Ortalama ağırlık: ' + format(g.weight,1) + ' g\n';
+        text += 'Günlük yemleme oranı: ' + format(g.percent,2) + ' %\n';
+        text += 'Günlük yem: ' + format(g.dailyFeed,2) + ' kg\n';
+        text += g.days + ' günlük toplam yem: ' + format(g.periodFeed,2) + ' kg\n';
+        text += '---\n';
+    });
+    text += '\nGENEL TOPLAM\n';
+    text += 'Toplam balık adedi: ' + totalCount.toLocaleString('tr-TR') + '\n';
+    text += 'Toplam biyokütle: ' + format(totalBiomass,2) + ' kg\n';
+    text += 'Toplam günlük yem: ' + format(totalDailyFeed,2) + ' kg\n';
+    text += 'Toplam haftalık yem (7 gün): ' + format(totalWeeklyFeed,2) + ' kg\n';
+    text += 'Toplam ' + multiGroups[0].days + ' günlük yem: ' + format(totalPeriodFeed,2) + ' kg\n';
+    document.getElementById('result').textContent = text;
+}
+
+function hesapla(){
+    const species = document.getElementById('species').value;
+    const count = toNum(document.getElementById('count').value);
+    const ponds = toNum(document.getElementById('pondCount').value);
+    const weight = toNum(document.getElementById('weight').value);
+    const percent = toNum(document.getElementById('percent').value);
+    const meals = toNum(document.getElementById('meals').value);
+    const region = document.getElementById('region').value;
+    const airtemp = document.getElementById('airtemp').value;
+    const wt = document.getElementById('watertemp').value;
+    const sal = document.getElementById('salinity').value;
+    const oxy = document.getElementById('oxygen').value;
+    const brand = document.getElementById('brand').value;
+    let fcrManual = toNum(document.getElementById('fcrManual').value);
+    const days = toNum(document.getElementById('days').value) || 30;
+    const stock = toNum(document.getElementById('stock').value);
+    let used = toNum(document.getElementById('used').value);
+
+    if(isNaN(count) || isNaN(weight) || isNaN(percent) || isNaN(meals)){
+        alert('Balık adedi, ağırlık, %yem ve öğün sayısını doldurun.');
+        return;
+    }
+
+    const biomass = count * weight / 1000.0;
+    const dailyFeed = biomass * (percent / 100.0);
+    const feedPerMeal = dailyFeed / meals;
+    const weeklyFeed = dailyFeed * 7;
+    const periodFeed = dailyFeed * days;
+
+    const pondsValid = !isNaN(ponds) && ponds > 0;
+    const dailyFeedPerPond = pondsValid ? (dailyFeed / ponds) : NaN;
+
+    let fcr, fcrNote;
+    if(!isNaN(fcrManual) && fcrManual>0){
+        fcr = fcrManual;
+        fcrNote = 'Manuel girilen FCR kullanıldı.';
+    } else {
+        fcr = fcrAuto(brand,species,weight);
+        fcrNote = 'Yem markası ('+brand+') ve ortalama gramaja göre otomatik FCR kullanıldı.';
+    }
+
+    const dailyGain = dailyFeed / fcr;
+    const periodGain = periodFeed / fcr;
+    const endBiomass = biomass + periodGain;
+    const endWeight = endBiomass * 1000.0 / count;
+
+    if(isNaN(used)) used = dailyFeed;
+
+    let stokText = '';
+    let remaining = NaN, daysLeft = NaN;
+    if(!isNaN(stock)){
+        remaining = stock - used;
+        if(remaining<0) remaining = 0;
+        daysLeft = dailyFeed>0 ? remaining/dailyFeed : NaN;
+        stokText += 'Başlangıç stok: '+format(stock,2)+' kg\n';
+        stokText += 'Kullanılan yem: '+format(used,2)+' kg\n';
+        stokText += 'Kalan stok: '+format(remaining,2)+' kg\n';
+        if(!isNaN(daysLeft)) stokText += 'Kalan stokla yaklaşık: '+format(daysLeft,1)+' gün yetebilir.\n\n';
+    }
+
+    let summary = 'ÖZET\n';
+    if(pondsValid){
+        summary += 'Havuz başı günlük yem: '+format(dailyFeedPerPond,2)+' kg\n';
+    }
+    summary += 'Toplam günlük yem: '+format(dailyFeed,2)+' kg\n';
+    if(!isNaN(remaining)){
+        summary += 'Depodan kalan stok: '+format(remaining,2)+' kg\n';
+    }
+    summary += '\n';
+
+    let locText = '';
+    if(region || airtemp){
+        locText += 'Bölge: '+(region||'-')+'\n';
+        if(airtemp) locText += 'Hava sıcaklığı: '+airtemp+' °C\n';
+        locText += '\n';
+    }
+
+    let text = '';
+    text += summary;
+    text += locText;
+    text += 'Balık türü: '+species+'\n';
+    text += 'Havuz sayısı: '+(pondsValid?ponds:'-')+'\n';
+    text += 'Balık adedi (toplam): '+count.toLocaleString('tr-TR')+'\n';
+    text += 'Ortalama ağırlık: '+format(weight,1)+' g\n';
+    text += 'Günlük yemleme oranı: '+format(percent,2)+' %\n';
+    text += 'Öğün sayısı: '+format(meals,0)+'\n\n';
+
+    text += 'Toplam biyokütle: '+format(biomass,2)+' kg\n';
+    text += 'Günlük yem: '+format(dailyFeed,2)+' kg\n';
+    text += 'Öğün başı yem: '+format(feedPerMeal,2)+' kg\n\n';
+
+    text += 'Haftalık yem (7 gün): '+format(weeklyFeed,2)+' kg\n';
+    text += days+' günlük toplam yem: '+format(periodFeed,2)+' kg\n\n';
+
+    text += 'Yem markası: '+brand+'\n';
+    text += 'Kullanılan FCR: '+format(fcr,2)+'\n';
+    text += fcrNote+'\n';
+    text += 'Günlük tahmini büyüme: '+format(dailyGain,2)+' kg\n';
+    text += days+' günde tahmini büyüme: '+format(periodGain,2)+' kg\n';
+    text += days+' gün sonu tahmini ortalama ağırlık: '+format(endWeight,1)+' g\n\n';
+
+    if(stokText) text += 'Stok durumu\n'+stokText;
+
+    text += 'Su değerleri\n';
+    text += 'Su sıcaklığı: '+(wt||'-')+' °C\n';
+    text += 'Tuzluluk: '+(sal||'-')+' ‰\n';
+    text += 'Oksijen: '+(oxy||'-')+' mg/L\n\n';
+
+    const yemText = yemOnerisi(species, weight);
+    text += 'Yem ölçüsü ve içeriği\n';
+    text += yemText+'\n';
+
+    if(airtemp){
+        text += '\nNot: Hava sıcaklığı '+airtemp+' °C. Ani hava değişimleri yem alma davranışını etkileyebilir; oranı sahadaki gözlemle birlikte değerlendiriniz.\n';
+    }
+
+    document.getElementById('result').textContent = text;
+    saveHistory(text);
+}
+
+function saveHistory(text){
+    try{
+        const key = 'deep_deniz_yemleme_logs';
+        let logs = [];
+        const raw = localStorage.getItem(key);
+        if(raw){ logs = JSON.parse(raw); }
+        const now = new Date().toLocaleString('tr-TR');
+        logs.unshift({time:now,text:text});
+        if(logs.length>20) logs.pop();
+        localStorage.setItem(key, JSON.stringify(logs));
+        renderHistory(logs);
+    }catch(e){
+        console.warn('History save failed', e);
+    }
+}
+
+function renderHistory(logs){
+    const div = document.getElementById('history');
+    if(!div) return;
+    if(!logs || !logs.length){
+        div.textContent = 'Kayıt yok.';
+        return;
+    }
+    let out = '';
+    logs.forEach((item,idx)=>{
+        out += '#'+(idx+1)+' - '+item.time+'\n';
+        out += item.text+'\n';
+        if(idx < logs.length-1) out += '------------------------------\n';
+    });
+    div.textContent = out;
+}
+
+function loadHistory(){
+    try{
+        const raw = localStorage.getItem('deep_deniz_yemleme_logs');
+        if(!raw){ renderHistory([]); return; }
+        const logs = JSON.parse(raw);
+        renderHistory(logs);
+    }catch(e){
+        renderHistory([]);
+    }
+}
+
+function shareWhatsApp(){
+    const text = document.getElementById('result').textContent || '';
+    if(!text){
+        alert('Önce HESAPLA yapmalısınız.');
+        return;
+    }
+    const url = 'https://wa.me/?text='+encodeURIComponent(text);
+    window.open(url, '_blank');
+}
+
+loadHistory();
+</script>
+
+</body>
+</html>
